@@ -18,8 +18,7 @@ let
   };
   zipcode_rel = "202011";
   jigyosyo = fetchurl {
-    url =
-      "https://osdn.net/projects/ponsfoot-aur/storage/mozc/jigyosyo-${zipcode_rel}.zip";
+    url = "https://osdn.net/projects/ponsfoot-aur/storage/mozc/jigyosyo-${zipcode_rel}.zip";
     sha256 = "j7MkNtd4+QTi91EreVig4/OV0o5y1+KIjEJBEmLK/mY=";
   };
   x-ken-all = fetchurl {
@@ -34,7 +33,7 @@ let
   };
 
 in clangStdenv.mkDerivation rec {
-  name = "fcitx5-mozc-${version}";
+  pname = "fcitx5-mozc";
   version = "2.26.4220.102";
 
   src = fetchFromGitHub {
@@ -44,10 +43,9 @@ in clangStdenv.mkDerivation rec {
     sha256 = "R+w0slVFpqtt7PIr1pyupJjRoQsABVZiMdZ9fKGKAqw=";
   };
 
-  nativeBuildInputs =
-    [ gyp ninja mesa python pkg-config qt5.wrapQtAppsHook six which unzip ];
-  buildInputs =
-    [ protobuf zinnia qt5.qtbase fcitx5 abseil-cpp jsoncpp gtest gtk2 ];
+  nativeBuildInputs = [ gyp ninja mesa python pkg-config qt5.wrapQtAppsHook six which unzip ];
+
+  buildInputs = [ protobuf zinnia qt5.qtbase fcitx5 abseil-cpp jsoncpp gtest gtk2 ];
 
   postUnpack = ''
     unzip ${x-ken-all} -d $sourceRoot/src/
@@ -108,12 +106,10 @@ in clangStdenv.mkDerivation rec {
   '';
 
   meta = with lib; {
-    description =
-      "Fcitx5 Module of A Japanese Input Method for Chromium OS, Windows, Mac and Linux (the Open Source Edition of Google Japanese Input)";
+    description = "Fcitx5 Module of A Japanese Input Method for Chromium OS, Windows, Mac and Linux (the Open Source Edition of Google Japanese Input)";
     homepage = "https://github.com/fcitx/mozc";
     license = licenses.bsd3;
     maintainers = with maintainers; [ berberman ];
     platforms = platforms.linux;
   };
-
 }
