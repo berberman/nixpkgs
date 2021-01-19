@@ -18,7 +18,7 @@ let
       rev = version;
       sha256 = "G+wkaC4IPtyc/xCUyVFJOcHppPFU7KkhIHjv6uhVKGU=";
     };
-
+    cmakeFlags = [ "-DCMAKE_CXX_STANDARD=17" "-DBUILD_SHARED_LIBS=ON" ];
   });
   zipcode_rel = "202011";
   jigyosyo = fetchurl {
