@@ -1,6 +1,6 @@
 { lib, clangStdenv, fetchFromGitHub, fetchurl, fetchpatch, fetchgit
 , python3Packages, mesa, ninja, pkg-config, protobuf, zinnia, qt5, fcitx5
-, jsoncpp, gtest, which, gtk2, unzip }:
+, jsoncpp, gtest, which, gtk2, unzip, abseil-cpp }:
 let
   inherit (python3Packages) python gyp six;
   japanese_usage_dictionary = fetchFromGitHub {
@@ -10,12 +10,16 @@ let
     sha256 = "0pyrpz9c8nxccwpgyr36w314mi8h132cis8ijvlqmmhqxwsi30hm";
   };
   # abseil-cpp in nixpkgs is too old
-  abseil-cpp = fetchFromGitHub {
-    owner = "abseil";
-    repo = "abseil-cpp";
-    rev = "20200923.2";
-    sha256 = "G+wkaC4IPtyc/xCUyVFJOcHppPFU7KkhIHjv6uhVKGU=";
-  };
+  abseil-cpp_2020923 = abseil-cpp.overrideAttrs (old: rec {
+    version = "20200923.2";
+    src = fetchFromGitHub {
+      owner = "abseil";
+      repo = "abseil-cpp";
+      rev = version;
+      sha256 = "G+wkaC4IPtyc/xCUyVFJOcHppPFU7KkhIHjv6uhVKGU=";
+    };
+
+  });
   zipcode_rel = "202011";
   jigyosyo = fetchurl {
     url = "https://osdn.net/projects/ponsfoot-aur/storage/mozc/jigyosyo-${zipcode_rel}.zip";
@@ -45,7 +49,16 @@ in clangStdenv.mkDerivation rec {
 
   nativeBuildInputs = [ gyp ninja mesa python pkg-config qt5.wrapQtAppsHook six which unzip ];
 
-  buildInputs = [ protobuf zinnia qt5.qtbase fcitx5 abseil-cpp jsoncpp gtest gtk2 ];
+  buildInputs = [ protobuf zinnia qt5.qtbase fcitx5 abseil-cpp_2020923 jsoncpp gtest gtk2 ];
+
+  patches = [
+    # Support linking system abseil-cpp
+    (fetchpatch {
+      url = "https://salsa.debian.org/debian/mozc/-/raw/debian/sid/debian/patches/0007-Update-src-base-absl.gyp.patch";
+      sha256 = "185zifx4swmcnrd07106l95xcwj7p4bmjwg5a031vw5xcq1w3d78";
+    })
+
+  ];
 
   postUnpack = ''
     unzip ${x-ken-all} -d $sourceRoot/src/
@@ -59,18 +72,12 @@ in clangStdenv.mkDerivation rec {
     ln -s ${gyp} $sourceRoot/src/third_party/gyp
     rmdir $sourceRoot/src/third_party/japanese_usage_dictionary/
     ln -s ${japanese_usage_dictionary} $sourceRoot/src/third_party/japanese_usage_dictionary
-    rmdir $sourceRoot/src/third_party/jsoncpp/
-    ln -s ${jsoncpp} $sourceRoot/src/third_party/jsoncpp
-    rmdir $sourceRoot/src/third_party/protobuf/
-    ln -s ${protobuf} $sourceRoot/src/third_party/protobuf
-    rmdir $sourceRoot/src/third_party/abseil-cpp/
-    ln -s ${abseil-cpp} $sourceRoot/src/third_party/abseil-cpp
   '';
 
   # Copied from https://github.com/archlinux/svntogit-community/blob/packages/fcitx5-mozc/trunk/PKGBUILD
   configurePhase = ''
     cd src
-    export GYP_DEFINES="document_dir=$out/share/doc/mozc use_libzinnia=1 use_libprotobuf=1"
+    export GYP_DEFINES="document_dir=$out/share/doc/mozc use_libzinnia=1 use_libprotobuf=1 use_libabseil=1"
 
     # disable fcitx4
     rm unix/fcitx/fcitx.gyp
