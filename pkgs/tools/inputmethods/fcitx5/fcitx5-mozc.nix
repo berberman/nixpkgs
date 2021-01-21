@@ -1,6 +1,6 @@
 { lib, clangStdenv, fetchFromGitHub, fetchurl, fetchpatch, fetchgit
 , python3Packages, mesa, ninja, pkg-config, protobuf, zinnia, qt5, fcitx5
-, jsoncpp, gtest, which, gtk2, unzip, abseil-cpp }:
+, jsoncpp, gtest, which, gtk2, unzip, abseil-cpp, breakpad }:
 let
   inherit (python3Packages) python gyp six;
   japanese_usage_dictionary = fetchFromGitHub {
@@ -29,11 +29,6 @@ let
     url =
       "https://osdn.net/projects/ponsfoot-aur/storage/mozc/x-ken-all-${zipcode_rel}.zip";
     sha256 = "ExS0Cg3rs0I9IOVbZHLt8UEfk8/LmY9oAHPVVlYuTPw=";
-  };
-  breakpad = fetchgit {
-    url = "https://chromium.googlesource.com/breakpad/breakpad";
-    rev = "216cea7bca53fa441a3ee0d0f5fd339a3a894224";
-    sha256 = "0Zokz1tszcnvFV4jYRQYvpdXs6ZHIUv5QodKSQJJVdc=";
   };
 
 in clangStdenv.mkDerivation rec {
