@@ -50,7 +50,7 @@ in clangStdenv.mkDerivation rec {
     # Support linking system abseil-cpp
     (fetchpatch {
       url = "https://salsa.debian.org/debian/mozc/-/raw/debian/sid/debian/patches/0007-Update-src-base-absl.gyp.patch";
-      sha256 = "185zifx4swmcnrd07106l95xcwj7p4bmjwg5a031vw5xcq1w3d78";
+      sha256 = "UiS0UScDKyAusXOhc7Bg8dF8ARQQiVTylEhAOxqaZt8=";
     })
 
   ];
