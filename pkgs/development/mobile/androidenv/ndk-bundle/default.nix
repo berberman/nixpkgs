@@ -4,16 +4,17 @@
 
 let
   runtime_paths = lib.makeBinPath (with pkgsHostHost; [
-    coreutils file findutils gawk gnugrep gnused jdk python3 which
+    coreutils file findutils gawk gnugrep gnused openjdk8 python39 which
   ]) + ":${platform-tools}/platform-tools";
 in
 deployAndroidPackage {
   inherit package os;
   nativeBuildInputs = [ autoPatchelfHook makeWrapper ];
-  buildInputs = lib.optional (os == "linux") [ pkgs.glibc pkgs.stdenv.cc.cc pkgs.python2 pkgs.ncurses5 pkgs.zlib pkgs.libcxx.out pkgs.libxml2 ];
+  buildInputs = lib.optional (os == "linux") [ pkgs.python39 pkgs.glibc pkgs.stdenv.cc.cc pkgs.python2 pkgs.ncurses5 pkgs.zlib pkgs.libcxx.out pkgs.libxml2 ];
   patchInstructions = lib.optionalString (os == "linux") (''
     patchShebangs .
-
+#     mv * ../
+#     cd ../
     # Fix the shebangs of the auto-generated scripts.
     substituteInPlace ./build/tools/make_standalone_toolchain.py \
       --replace '#!/bin/bash' '#!${pkgs.bash}/bin/bash'
